@@ -45,6 +45,7 @@
      login(){
         if(this.user == 'test' &&this.password == '1234'){
             alert('ເຂົ້າສູ່ລະບົບສຳເລັດ')
+            localStorage.setItem('Token','login')
             this. $router.push({ name: 'home' })
         }else{
         alert('ກະລຸນາກວດສອບຄືນ')

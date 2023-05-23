@@ -1,7 +1,9 @@
 <template>
   
   <div>
-    <v-container> <SideBar/></v-container>
+    <v-container> 
+      <SideBar/>
+    </v-container>
    
       <router-view/>
   </div>
@@ -17,7 +19,12 @@ export default {
   components: {
 
     SideBar
-  }
+  },
+  created() {
+    if (!localStorage.getItem('Token')) {
+      this.$router.push({ name: "Login" });
+    }
+  },
 }
 </script>
 <style>
