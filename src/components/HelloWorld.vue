@@ -5,7 +5,6 @@
   class="mx-auto"
   title="Todo list"
 >
-
 <v-container>  
   <hr>
   <v-row class="mt-13">
@@ -26,7 +25,7 @@
     </v-card-item>
 
     <v-card-actions>
-      <v-btn @click="dialog = true, $router.push({ query: { content: i.detail } })" variant="outlined">
+      <v-btn @click="dialog = true, $router.push({ query: { id: i._id, content: i.detail } })" variant="outlined">
         Button
       </v-btn>
     </v-card-actions>
@@ -45,12 +44,20 @@
       width="auto"
     >
 
-      <v-card>
-        <v-card-text>
-          {{ $route.query.content }}
+      <v-card width="300" class="mx-auto">
+        <v-card-text >
+
+      <v-text-field
+        v-model="detail"
+        :rules="rules"
+        label="detail"
+      ></v-text-field>
+      <v-btn type="submit" @click="updateCard" block class="mt-2">Submit</v-btn>
+
+          
         </v-card-text>
         <v-card-actions>
-          <v-btn color="primary" block @click="dialog = false">Close Dialog</v-btn>
+          <v-btn color="primary" block @click="dialog = false, $router.push({ query: {  } })">Close Dialog</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -63,55 +70,61 @@
 export default {
   name: 'App',
   data: () => ({
+
     dialog: false,
+    detail:'',
     page: 1,
 			pageSize: 8,
       listCount: 0,
 			historyList: [],
-    card:[
-    {detail:"Greyhound divisely hello coldly 1", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 2", status:'outlined'},
-    {detail:"Greyhound divisely hello coldly 3", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 4", status:'outlined'},
-    {detail:"Greyhound divisely hello coldly 5", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 6", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 7", status:'outlined'},
-    {detail:"Greyhound divisely hello coldly 1", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 2", status:'outlined'},
-    {detail:"Greyhound divisely hello coldly 3", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 4", status:'outlined'},
-    {detail:"Greyhound divisely hello coldly 5", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 6", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 7", status:'outlined'},
-    {detail:"Greyhound divisely hello coldly 1", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 2", status:'outlined'},
-    {detail:"Greyhound divisely hello coldly 3", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 4", status:'outlined'},
-    {detail:"Greyhound divisely hello coldly 5", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 6", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 7", status:'outlined'},
-    {detail:"Greyhound divisely hello coldly 1", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 2", status:'outlined'},
-    {detail:"Greyhound divisely hello coldly 3", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 4", status:'outlined'},
-    {detail:"Greyhound divisely hello coldly 5", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 6", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 7", status:'outlined'},
-    {detail:"Greyhound divisely hello coldly 1", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 2", status:'outlined'},
-    {detail:"Greyhound divisely hello coldly 3", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 4", status:'outlined'},
-    {detail:"Greyhound divisely hello coldly 5", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 6", status:'tonal'},
-    {detail:"Greyhound divisely hello coldly 7", status:'outlined'},
-  ]
+    card:[],
+    rules: [
+        value => {
+          if (value) return true
+
+          return 'You must enter a first name.'
+        },
+      ],
+
     }),
     created() {
-		
-		this.initPage();
-		
+     // 
+      this.get()
+    
 	},
   methods: {
+    get(){
+      this.$axios.get('/product')
+        .then((response) => {
+          this.card = response.data
+          this.initPage() 
+        },(error)=>{
+        if (error) {
+          console.log(error.response.status)
+          if(error.response.status == '403'){
+            this.$router.push({ name: 'Login' })
+            localStorage.removeItem('Token')
+          }
+        }
+      })
+    },
+    updateCard(){
+      this.$axios.put('/product/'+this.$route.query.id,{
+        detail:this.detail
+        })
+        .then(() => {
+          this.dialog = false
+          this.get()
+        },(error)=>{
+        if (error) {
+          console.log(error.response.status)
+          if(error.response.status == '403'){
+            this.$router.push({ name: 'Login' })
+            localStorage.removeItem('Token')
+          }
+        }
+      })
+    },
 		initPage() {
 			
 			this.listCount = this.card.length;
@@ -129,6 +142,15 @@ export default {
 			this.page = pageIndex;
 		}
 	},
+  watch:{
+  "$route.query.content":{
+    handler() {
+        this.detail = this.$route.query.content;
+        //  }
+      },
+      immediate: true,
+  }
+  },
 	computed: {
 		pages() {
 			

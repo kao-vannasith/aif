@@ -6,7 +6,7 @@
         <v-spacer></v-spacer>
 
         <v-card-actions>
-      <v-btn @click="$router.push({ name: 'Login' })" variant="outlined">
+      <v-btn @click="loguot" variant="outlined">
         Logout
       </v-btn>
     </v-card-actions>
@@ -19,6 +19,11 @@
 
 export default {
   name: 'SideBar',
- 
+ methods:{
+  loguot(){
+    localStorage.removeItem('Token')
+    this.$router.push({ name: 'Login' })
+  }
+}
 }
 </script>

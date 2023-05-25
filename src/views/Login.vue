@@ -3,14 +3,14 @@
   <v-sheet height="200" width="600" class="mx-auto">
     <v-form fast-fail @submit.prevent>
       <v-text-field
-        v-model="user"
-        label="First name"
-        :rules="userRules"
+        v-model="email"
+        label="email"
+        :rules="emailRules"
       ></v-text-field>
 
       <v-text-field
         v-model="password"
-        label="Last name"
+        label="password"
         :rules="passwordRules"
       ></v-text-field>
 
@@ -24,15 +24,15 @@
   export default {
     name:'HomeView',
     data: () => ({
-      user: 'test',
-      userRules: [
+      email: 'kao@gmail.com',
+      emailRules: [
         value => {
-          if (value?.length > 3) return true
+          if (/^[a-z.-]+@[a-z.-]+\.[a-z]+$/i.test(value)) return true
 
-          return 'user 4.'
+              return 'Must be a valid e-mail.'
         },
       ],
-      password: '1234',
+      password: '123456',
       passwordRules: [
       value => {
           if (value?.length > 3) return true
@@ -43,14 +43,20 @@
     }),
     methods:{
      login(){
-        if(this.user == 'test' &&this.password == '1234'){
-            alert('ເຂົ້າສູ່ລະບົບສຳເລັດ')
-            localStorage.setItem('Token','login')
-            this. $router.push({ name: 'home' })
-        }else{
-        alert('ກະລຸນາກວດສອບຄືນ')
+      this.$axios.post('/auth/login',{
+        email:this.email,
+        password:this.password
+        }).then((response) => {
+          alert('ເຂົ້າສູ່ລະບົບສຳເລັດ')
+          localStorage.setItem('Token', response.data.authentication.sessionToken)
+          this. $router.push({ name: 'home' })
+        },(error)=>{
+        this.loading = true
+        if (error) {
+          console.log(error)
+          alert('ກະລຸນາກວດສອບຄືນ')
         }
-        
+      })
         
     }
     }
