@@ -82,7 +82,7 @@ export default {
         value => {
           if (value) return true
 
-          return 'You must enter a first name.'
+          return 'You must enter a detail.'
         },
       ],
 
